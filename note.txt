@@ -1,0 +1,56 @@
+Origine de la Binary Cross-Entropy function (aussi appellee log loss):
+
+formule:
+
+E = -1/N * (Somme de n = 1 a N de ( yn * log(pn) + (1 - yn) * log(1 - pn) )) 
+Ou N est la taille du data set, yn est le resultat attendu (0 ou 1), et pn est la probabilitee calculee par le modele
+
+Le but est de calculer les pertes du modele en calculant la difference entre les vraies valeures et celles obtenues pas le modele
+Pour pouvoir les minimiser via une desscente de gradient.
+
+Mais d'ou vient cette formule ?
+
+En realite, elle est assez simple a comprendre:
+
+On cherche a la base a calculer la vraissemblence de tous les resultats, c'est a dire faire le produit de toutes les probabilitee
+Nos resultats seront 0 ou 1, on obtient donc ces probabilitees:
+
+P(Y = 1) = a(z) (la probabilitee calculee pas la fonction d'activation, on utilisera la fonction Sigmoïde, et z est le resultat trouve par le modele grace a z = wx + b)
+Et reciproquement:
+P(Y = 0) = 1 - a(z)
+
+On peut ensuite resumer le tout en une seule formule:
+P(Y = y) = (a(z) ** y) * ((1 - a(z)) ** 1 - y)
+(exemple: P(Y = 1) = (a(z) ** 1) * ((1 - a(z)) ** 0) <=> P(Y = y) = (a(z)) * 1)
+
+on remplace a(z) par p pour la lisibilite (p = proba renvoyee pas a(z))
+Ensuite, pour multiplier toutes les probabilitees, plus qu'a faire:
+L(Likelihood) = Produit de n = 1 a N de (pn ** yn) * ((1 - pn) ** 1 - yn)
+
+Cependant, en faisant un produit de probabilitees, on va se rapprocher de plus en plus de 0 (cat P toujours <= 1),
+ce qui peut poser probleme a l'ordinateur pour les calculs au bout d'un moment.
+
+C'est la qu'intervient log(), car log(a * b) = log(a) + log(b) et que log() est une fonction monotonne croissante, 
+elle conserve donc l'ordre des thermes.
+
+On peut donc faire cela:
+LL = log(L) = log(Produit de n = 1 a N de (pn ** yn) * ((1 - pn) ** 1 - yn))
+On ferait donc (log(0.8 * 0.4 * 0.7) = log(0.8) + log(0.4) + log(0.7) + log(0.1) = -1.6498  plutot que 0.8 * 0.4 * 0.7 * 0.1 = 0.0224)
+
+Puisque la fonction log conserve l'ordre des thermes, chercher le max du log de la vraissemblence revient a chercher le 
+max de la vraissemblence
+
+Plus qu'a transformer un peu cette formule:
+
+log(Produit de n = 1 a N de (pn ** yn) * ((1 - pn) ** 1 - yn))
+<=> Somme de n = 1 a N de log((pn ** yn) * ((1 - pn) ** 1 - yn)) (car logarithme d'un produit equivaut a la somme des logarithmes)
+<=> Somme de n = 1 a N de log(pn ** yn) + log((1 - pn) ** 1 - yn) (car encore un produit)
+<=> Somme de n = 1 a N de yn * log(pn) + 1 - yn * log((1 - pn)) (car log(x**n) = nlog(x))
+
+Finalement pour arriver a la fonction E, il ne manque que -1/N devant,
+Ici on cherchais a faire une maximisation de la vraissemblence, mais en realite, il est plus approprie de minimiser une fonction
+on va alors minimiser la fonction inverse qui est logiquement:
+-1 * (Somme de n = 1 a N de yn * log(pn) + 1 - yn * log((1 - pn)) (car log(x**n) = nlog(x)))
+
+Puis on divise finalement le tout par N pour normaliser le resultat final, on obtient donc bien:
+E = -1/N * (Somme de n = 1 a N de ( yn * log(pn) + (1 - yn) * log(1 - pn) ))
