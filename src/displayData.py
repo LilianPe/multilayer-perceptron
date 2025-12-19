@@ -24,8 +24,12 @@ import numpy
 # # Enlever l'affichage, puis coder le modele de maniere propre:
 # # POO, puis utiliser un main et une structure propre, doc de fonctions etc...
 
-class MultilayerPerceptron :
-    def __init__() :
-        pass
+# class MultilayerPerceptron :
+#     def __init__() :
+#         pass
     
-    
+
+
+# Actuellement: 1 perceptron
+# Regarder des videos pour passer de 1 perceptron a un reseau de perceptron
+# Revoir comment marche en details le perceptron
