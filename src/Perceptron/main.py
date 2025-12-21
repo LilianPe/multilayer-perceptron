@@ -1,4 +1,4 @@
-from utils import splitDataset, parseData, trainModel, modelAccuracy
+from utils import splitDataset, parseData, trainPerceptron, perceptronAccuracy
 from Perceptron import Perceptron
 
 
@@ -15,8 +15,8 @@ def perceptronTest():
     train_X, train_Y, test_X, test_Y = handleData()
 
     model: Perceptron = Perceptron(train_X, train_Y)
-    trainModel(model)
-    accuracy: int = modelAccuracy(model, test_X, test_Y)
+    trainPerceptron(model)
+    accuracy: int = perceptronAccuracy(model, test_X, test_Y)
     print(f"Model Accuracy: {accuracy}%.")
 
 def main():
