@@ -14,10 +14,11 @@ class MultilayerPerceptron :
 
 		self.X = X
 		self.Y = Y
+		self.dataset_size = X.shape[1]
 
-	def forwardPropagation(self) :
+	def forwardPropagation(self, batch_X) :
 		activations = []
-		activations.append(self.X)
+		activations.append(batch_X)
 		for i in range(0, self.n_layers-1):
 			self.Z = self.W_array[i].dot(activations[i]) + self.b_array[i]
 			self.A = 1 / (1 + np.exp(-self.Z))
@@ -33,16 +34,18 @@ class MultilayerPerceptron :
 			activations.append(A)
 		return A
 
-	def log_loss(self) :
-		eps = 1e-15 
-		A_clipped = np.clip(self.A, eps, 1 - eps) # pour éviter log(0) (empeche les valeures d'etre en dehors de l'interval 𝐴∈[10**−15,1−10**−15]
-		result = -1 / self.X.shape[0] * np.sum(self.Y * np.log(A_clipped) + (1 - self.Y) * np.log(1 - A_clipped))
+	def logLoss(self, X, Y) :
+		eps = 1e-15
+		m = X.shape[1]
+		A = self.predict(X)
+		A_clipped = np.clip(A, eps, 1 - eps) # pour éviter log(0) (empeche les valeures d'etre en dehors de l'interval 𝐴∈[10**−15,1−10**−15]
+		result = -1 / m * np.sum(Y * np.log(A_clipped) + (1 - Y) * np.log(1 - A_clipped))
 		return result
 
-	def backPropagation(self, activations) :
-		m = self.X.shape[1] # Taille du dataset
+	def backPropagation(self, batch_X, batch_Y, activations) :
+		m = batch_X.shape[1] # Taille du dataset
 
-		dZ = activations[self.n_layers - 1] - self.Y
+		dZ = activations[self.n_layers - 1] - batch_Y
 		gradients_dW = []
 		gradients_db = []
 
@@ -58,3 +61,12 @@ class MultilayerPerceptron :
 		for i in range(0, self.n_layers - 1):
 			self.W_array[i] -= learning_rate * gradient_dW[i]
 			self.b_array[i] -= learning_rate * gradient_db[i]
+	
+	def getBatch(self, batch_size: int, iteration: int):
+		start = iteration * batch_size
+		end   = start + batch_size
+
+		X_batch = self.X[:, start:end]
+		Y_batch = self.Y[:, start:end]
+
+		return X_batch, Y_batch

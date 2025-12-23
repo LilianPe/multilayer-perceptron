@@ -1,7 +1,4 @@
 import pandas
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from MultilayerPerceptron import MultilayerPerceptron
@@ -32,16 +29,38 @@ def parseData(trainDataPath: str, testDataPath: str):
     # Normalisation des donnees
     scaler = StandardScaler()
     XTrain_scaled = scaler.fit_transform(train_X)
-    XTest_scaled = scaler.fit_transform(test_X)
+    XTest_scaled = scaler.transform(test_X)
     return XTrain_scaled, train_Y, XTest_scaled, test_Y
 
-def trainMLP(m: MultilayerPerceptron, epochs: int, learningRate: float):
-    activations = m.forwardPropagation()
+def updatePerformances(m, dataset, perfValues):
+    perfValues["lossT"].append(m.logLoss(dataset["train_X"].T, dataset["train_Y"]))
+    perfValues["lossV"].append(m.logLoss(dataset["validation_X"].T, dataset["validation_Y"]))
+    perfValues["accuracyT"].append(MLPAccuracy(m, dataset["train_X"].T, dataset["train_Y"]))
+    perfValues["accuracyV"].append(MLPAccuracy(m, dataset["validation_X"].T, dataset["validation_Y"]))
 
+def initPerfValues():
+    lossT = []
+    lossV = []
+    accuracyT = []
+    accuracyV = []
+    perfValues = {"lossT": lossT, "lossV": lossV, "accuracyT": accuracyT, "accuracyV": accuracyV}
+    return perfValues
+
+def trainMLP(m: MultilayerPerceptron, epochs: int, learningRate: float, batch_size: int, dataset):
+    perfValues = initPerfValues()
+    updatePerformances(m, dataset, perfValues)
     for i in tqdm(range(epochs)):
-        activations = m.forwardPropagation()
-        gradients_dW, gradients_db = m.backPropagation(activations)
-        m.update(gradients_dW, gradients_db, learningRate)
+        total = 0
+        iteration = 0
+        while(total < m.dataset_size):
+            batch_X, batch_Y = m.getBatch(batch_size, iteration)
+            activations = m.forwardPropagation(batch_X)
+            gradients_dW, gradients_db = m.backPropagation(batch_X, batch_Y, activations)
+            m.update(gradients_dW, gradients_db, learningRate)
+            total += batch_size
+            iteration += 1
+        updatePerformances(m, dataset, perfValues)
+    return perfValues
 
 def MLPAccuracy(model: MultilayerPerceptron, X, Y) :
 	A = model.predict(X)[0]
