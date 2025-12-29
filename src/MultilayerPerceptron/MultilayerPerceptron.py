@@ -9,6 +9,8 @@ class MultilayerPerceptron :
 		self.n_hlayers = len(hiddenLayers)
 		self.W_array = []
 		self.b_array = []
+		self.scaler_mean = 0
+		self.scaler_scale = 0
 
 		for i in range(1, self.n_hlayers):
 			self.W_array.append(np.random.randn(hiddenLayers[i], hiddenLayers[i-1]))
@@ -100,7 +102,9 @@ class MultilayerPerceptron :
 			{
 				"W_array": self.W_array,
 				"b_array": self.b_array,
-				"n_hlayers": self.n_hlayers
+				"n_hlayers": self.n_hlayers,
+				"scaler_mean": self.scaler_mean,
+				"scaler_scale": self.scaler_scale
 			},
 			allow_pickle=True
 		)
@@ -108,13 +112,13 @@ class MultilayerPerceptron :
 	
 	@classmethod
 	def loadModel(cls, path):
-		data = np.load(path, allow_pickle=True)
+		data = np.load(path, allow_pickle=True).item()
 		
 		# créer une instance sans appeler __init__
 		model = cls.__new__(cls)
 		
-		model.W_array = data["W_array"].tolist()
-		model.b_array = data["b_array"].tolist()
+		model.W_array = data["W_array"]
+		model.b_array = data["b_array"]
 		model.n_hlayers = data["n_hlayers"]
 		
 		return model

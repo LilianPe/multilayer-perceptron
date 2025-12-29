@@ -1,10 +1,12 @@
-from utils import splitDataset, parseData, trainMLP, MLPAccuracy, BCEAccuracy
+from utils import parseData, trainMLP, MLPAccuracy, BCEAccuracy
 from MultilayerPerceptron import MultilayerPerceptron
 import argparse
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
-def handleData(trainDatasetPath: str, testDatasetPath: str):
-    return parseData(trainDatasetPath, testDatasetPath)
+
+def handleData(trainDatasetPath: str, testDatasetPath: str, scaler):
+    return parseData(trainDatasetPath, testDatasetPath, scaler)
 
 def displayLossGraph(lossT, lossV):
     epochs = range(len(lossT))
@@ -31,17 +33,20 @@ def displayAccuracyGraph(accuracyT, accuracyV):
     plt.show()
 
 def multilayePerceptronTest(args):
-    train_X, train_Y, validation_X, validation_Y = handleData(args.train_set, args.validation_set)
+    scaler = StandardScaler()
+    train_X, train_Y, validation_X, validation_Y = handleData(args.train_set, args.validation_set, scaler)
     dataset = {"train_X": train_X, "train_Y": train_Y, "validation_X": validation_X, "validation_Y": validation_Y}
 
     model: MultilayerPerceptron = MultilayerPerceptron(train_X.shape[1], args.layers, 2)
+    model.scaler_mean = scaler.mean_
+    model.scaler_scale = scaler.scale_
     perfValues = trainMLP(model, args.epochs, args.learning_rate, args.batch_size, dataset)
     model.saveModel(args.save_model_path)
     displayLossGraph(perfValues["lossT"], perfValues["lossV"])
     displayAccuracyGraph(perfValues["accuracyT"], perfValues["accuracyV"])
-    accuracy: int = MLPAccuracy(model, validation_X.T, validation_Y)
-    print(f"Model Accuracy: {accuracy}%.")
-    accuracy: int = BCEAccuracy(model, validation_X.T, validation_Y)
+    # accuracy: int = MLPAccuracy(model, validation_X.T, validation_Y)
+    # print(f"Model Accuracy: {accuracy}%.")
+    # accuracy: int = BCEAccuracy(model, validation_X.T, validation_Y)
 
 def handleArguments():
     parser = argparse.ArgumentParser(description="Multilayer Perceptron creation parameters")

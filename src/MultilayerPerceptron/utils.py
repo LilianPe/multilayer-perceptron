@@ -1,9 +1,7 @@
 import pandas
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from MultilayerPerceptron import MultilayerPerceptron
-from tqdm import tqdm
 from pathlib import Path
 
 def checkPaths(dataPath: str, trainDataPath: str, testDataPath: str):
@@ -28,7 +26,7 @@ def splitDataset(dataPath: str, trainDataPath: str, testDataPath: str):
     train_df.to_csv(trainDataPath, index=False)
     test_df.to_csv(testDataPath, index=False)
 
-def parseData(trainDataPath: str, testDataPath: str):
+def parseData(trainDataPath: str, testDataPath: str, scaler):
     train_data = pandas.read_csv(trainDataPath, header=0)
     test_data = pandas.read_csv(testDataPath, header=0)
     train_X = train_data.iloc[:, 2:] # La data sans id et diagnosis
@@ -38,22 +36,19 @@ def parseData(trainDataPath: str, testDataPath: str):
 
     # numpy arrays :
     train_X = train_X.to_numpy()
-    train_Y = train_Y.to_numpy().reshape(-1, 1)
+    train_Y = train_Y.to_numpy()
     test_X = test_X.to_numpy()
-    test_Y = test_Y.to_numpy().reshape(-1, 1)
+    test_Y = test_Y.to_numpy()
 
     # passer Y en One hot (format pour categorical crossentropy)
     train_Y_onehot = np.zeros((2, train_Y.shape[0]))
-    train_Y_onehot[0, :] = 1 - train_Y.flatten()
-    train_Y_onehot[1, :] = train_Y.flatten()
+    train_Y_onehot[0, :] = 1 - train_Y
+    train_Y_onehot[1, :] = train_Y
     test_Y_onehot = np.zeros((2, test_Y.shape[0]))
-    test_Y_onehot[0, :] = 1 - test_Y.flatten()
-    test_Y_onehot[1, :] = test_Y.flatten()
-
-    # print(train_Y_onehot)
+    test_Y_onehot[0, :] = 1 - test_Y
+    test_Y_onehot[1, :] = test_Y
 
     # Normalisation des donnees
-    scaler = StandardScaler()
     XTrain_scaled = scaler.fit_transform(train_X)
     XTest_scaled = scaler.transform(test_X)
     return XTrain_scaled, train_Y_onehot, XTest_scaled, test_Y_onehot
