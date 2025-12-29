@@ -40,7 +40,7 @@ def multilayePerceptronTest(args):
     model: MultilayerPerceptron = MultilayerPerceptron(train_X.shape[1], args.layers, 2)
     model.scaler_mean = scaler.mean_
     model.scaler_scale = scaler.scale_
-    perfValues = trainMLP(model, args.epochs, args.learning_rate, args.batch_size, dataset)
+    perfValues = trainMLP(model, args.epochs, args.learning_rate, args.batch_size, dataset, args.loss)
     model.saveModel(args.save_model_path)
     displayLossGraph(perfValues["lossT"], perfValues["lossV"])
     displayAccuracyGraph(perfValues["accuracyT"], perfValues["accuracyV"])
@@ -53,11 +53,11 @@ def handleArguments():
     parser.add_argument("--train_set", type=str, required=True, help="Path to the training set")
     parser.add_argument("--validation_set", type=str, required=True, help="Path to the validation set")
     parser.add_argument("--save_model_path", type=str, required=True, help="Path to save the model")
-    parser.add_argument("--layers", type=int, nargs="+", default=[24, 24], help="Layers sizes") # V
-    parser.add_argument("--epochs", type=int, default=100, help="Epochs number") # V
-    parser.add_argument("--loss", type=str, default="categoricalCrossentropy",choices=["categoricalCrossentropy"], help="Loss function") # X
-    parser.add_argument("--batch_size", type=int, default=8, help="Batch size") # V
-    parser.add_argument("--learning_rate", type=float, default=0.5, help="Learning rate") # V
+    parser.add_argument("--layers", type=int, nargs="+", default=[24, 24], help="Layers sizes")
+    parser.add_argument("--epochs", type=int, default=100, help="Epochs number")
+    parser.add_argument("--loss", type=str, default="categoricalCrossentropy",choices=["categoricalCrossentropy", "binaryCrossentropy"], help="Loss function")
+    parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
+    parser.add_argument("--learning_rate", type=float, default=0.5, help="Learning rate")
     return parser
 
 def main():
@@ -67,20 +67,10 @@ def main():
 if __name__ == "__main__":
     main()
 
+# Maintenant, a voir si bonus
+# Bonus interessants:
 
-# Pour l'instant, on ignore le parametre loss, a quoi il sert ? Pas demande d'implemente autre chose que categoricalCrossentropy
-# -> A revoir quand meme pour etre sur
-
-
-# Decouper le main en 3, 1 qui fait le splitData, un qui cree et entraine le mlp, puis save ses weights / bias et affiche les graphes
-# , puis un qui load le fichier et donne le resultat d'une prediction   
-
-# Actuellement, binary cross entropy utilise + sigmoide sur output, passer a categorical cross entropy + softmax sur output
-# Mais pour l'instant ca fait nimp
-# Probleme venait de la shape de Y
-
-# Recheck les choses demandees dans le sujet mais ca me parait pas mal
-
-# Reste a faire le 3eme main
-
-# Pour le main predict, revoir comment il marche, sujet demande d'evaluer un dataset avec logLoss, mais pas tres visuel et deja fait avant ?
+# - Voir ce qu'est early stoping
+# - Ajouter quelques metriques + historique de celles ci (2 bonus)
+# - Voir ce qu'est une optimisation fonction, et si ca vaut le coup d'en implementer une plus complexe
+# - Dernier bonus parait pas tres interessant, mais a revoir

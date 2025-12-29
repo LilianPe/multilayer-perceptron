@@ -53,9 +53,14 @@ def parseData(trainDataPath: str, testDataPath: str, scaler):
     XTest_scaled = scaler.transform(test_X)
     return XTrain_scaled, train_Y_onehot, XTest_scaled, test_Y_onehot
 
-def updatePerformances(m, dataset, perfValues):
-    perfValues["lossT"].append(m.categoricalCrossentropy(dataset["train_X"].T, dataset["train_Y"]))
-    perfValues["lossV"].append(m.categoricalCrossentropy(dataset["validation_X"].T, dataset["validation_Y"]))
+def updatePerformances(m, dataset, perfValues, lossFunction: str):
+    if lossFunction == "categoricalCrossentropy":
+        perfValues["lossT"].append(m.categoricalCrossentropy(dataset["train_X"].T, dataset["train_Y"]))
+        perfValues["lossV"].append(m.categoricalCrossentropy(dataset["validation_X"].T, dataset["validation_Y"]))
+    else:
+        perfValues["lossT"].append(BCEAccuracy(m, dataset["train_X"].T, dataset["train_Y"]))
+        perfValues["lossV"].append(BCEAccuracy(m, dataset["validation_X"].T, dataset["validation_Y"]))
+
     perfValues["accuracyT"].append(MLPAccuracy(m, dataset["train_X"].T, dataset["train_Y"]))
     perfValues["accuracyV"].append(MLPAccuracy(m, dataset["validation_X"].T, dataset["validation_Y"]))
 
@@ -71,13 +76,13 @@ def printPerformances(perfValues, epoch, n_epochs):
     width = len(str(n_epochs))
     print(f"epoch {epoch:0{width}d}/{n_epochs} - loss: {perfValues["lossT"][epoch-1]} - val_loss: {perfValues["lossV"][epoch-1]}")
 
-def trainMLP(m: MultilayerPerceptron, epochs: int, learningRate: float, batch_size: int, dataset):
+def trainMLP(m: MultilayerPerceptron, epochs: int, learningRate: float, batch_size: int, dataset, lossFunction: str):
     print(f"x_train shape : {dataset["train_X"].shape}")
     print(f"x_valid shape : {dataset["validation_X"].shape}")
     
     dataset_size = dataset["train_X"].shape[0]
     perfValues = initPerfValues()
-    updatePerformances(m, dataset, perfValues)
+    updatePerformances(m, dataset, perfValues, lossFunction)
     for epoch in range(epochs):
         total = 0
         iteration = 0
@@ -88,7 +93,7 @@ def trainMLP(m: MultilayerPerceptron, epochs: int, learningRate: float, batch_si
             m.update(gradients_dW, gradients_db, learningRate)
             total += batch_size
             iteration += 1
-        updatePerformances(m, dataset, perfValues)
+        updatePerformances(m, dataset, perfValues, lossFunction)
         printPerformances(perfValues, epoch+1, epochs)
     return perfValues
 
@@ -105,6 +110,5 @@ def BCEAccuracy(model: MultilayerPerceptron, X, Y):
     A_bin = A[1, :]
     A_bin = np.clip(A_bin, eps, 1 - eps)
     Y_bin = Y[1, :]
-    m = len(Y_bin)
     loss = - np.mean(Y_bin * np.log(A_bin) + (1 - Y_bin) * np.log(1 - A_bin))
     return loss
