@@ -1,3 +1,7 @@
+### ⚠️ Conseil
+Si vous consultez ce README sur GitHub, notez que les formules LaTeX peuvent ne pas s'afficher correctement.  
+Pour un rendu optimal, ouvrez le fichier dans un IDE ou éditeur Markdown supportant LaTeX (VSCode, Typora, Obsidian…).
+
 # Origine de la Binary Cross-Entropy function (aussi appellee log loss):
 
 ## formule:
