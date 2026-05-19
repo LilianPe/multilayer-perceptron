@@ -44,9 +44,6 @@ def multilayePerceptronTest(args):
     model.saveModel(args.save_model_path)
     displayLossGraph(perfValues["lossT"], perfValues["lossV"])
     displayAccuracyGraph(perfValues["accuracyT"], perfValues["accuracyV"])
-    # accuracy: int = MLPAccuracy(model, validation_X.T, validation_Y)
-    # print(f"Model Accuracy: {accuracy}%.")
-    # accuracy: int = BCEAccuracy(model, validation_X.T, validation_Y)
 
 def handleArguments():
     parser = argparse.ArgumentParser(description="Multilayer Perceptron creation parameters")

@@ -74,11 +74,11 @@ def initPerfValues():
 
 def printPerformances(perfValues, epoch, n_epochs):
     width = len(str(n_epochs))
-    print(f"epoch {epoch:0{width}d}/{n_epochs} - loss: {perfValues["lossT"][epoch-1]} - val_loss: {perfValues["lossV"][epoch-1]}")
+    print(f"epoch {epoch:0{width}d}/{n_epochs} - loss: {perfValues['lossT'][epoch-1]} - val_loss: {perfValues['lossV'][epoch-1]}")
 
 def trainMLP(m: MultilayerPerceptron, epochs: int, learningRate: float, batch_size: int, dataset, lossFunction: str):
-    print(f"x_train shape : {dataset["train_X"].shape}")
-    print(f"x_valid shape : {dataset["validation_X"].shape}")
+    print(f"x_train shape : {dataset['train_X'].shape}")
+    print(f"x_valid shape : {dataset['validation_X'].shape}")
     
     dataset_size = dataset["train_X"].shape[0]
     perfValues = initPerfValues()
