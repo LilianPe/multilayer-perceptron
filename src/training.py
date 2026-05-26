@@ -1,9 +1,11 @@
 from utils import parseData, trainMLP, MLPAccuracy, BCEAccuracy
 from MultilayerPerceptron import MultilayerPerceptron
 import argparse
+import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
+matplotlib.use("Qt5Agg")
 
 def handleData(trainDatasetPath: str, testDatasetPath: str, scaler):
     return parseData(trainDatasetPath, testDatasetPath, scaler)

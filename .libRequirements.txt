@@ -1,5 +1,6 @@
 pandas
 matplotlib
+pyqt5
 seaborn
 scikit-learn
 tqdm
